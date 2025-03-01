@@ -1,43 +1,51 @@
 package ru.vasiliygrinin.netty.chat.server;
 
 import io.netty.channel.Channel;
+import io.netty.channel.ChannelFuture;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 import ru.vasiliygrinin.netty.chat.server.messags.RequestMessagePackage;
 import ru.vasiliygrinin.netty.chat.server.messags.ResponseMessagePackage;
+import ru.vasiliygrinin.netty.chat.server.votes.Vote;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 
 public class MainHandler extends SimpleChannelInboundHandler<RequestMessagePackage> {
 
-    private static final List<Channel> channels = new ArrayList<>();
     public static final int ID_HANDLERS = 0;
 
-    private RequestHandler requestHandler;
+    private CommandManager commandManager;
 
+    public MainHandler(ConcurrentMap<String, List<Vote>> map) {
 
+    }
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
 
-//        requestHandler = new RequestHandler();
+        commandManager = new CommandManager();
         System.out.println("Клиент подключился: " + ctx);
-//        System.out.println("Клинету присвоено имя: " + requestHandler.getClientName());
-        channels.add(ctx.channel());
+
 
     }
 
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, RequestMessagePackage requestMessagePackage) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, RequestMessagePackage message) throws Exception {
 
-        System.out.println(requestMessagePackage);
+        System.out.println(message);
+
+        if(message.getIdHandlers() != 0){
+//            TODO
+        }else{
+
+            ctx.writeAndFlush(commandManager.doCommand(ctx, message));
+        }
 
 
-
-        ctx.writeAndFlush(new ResponseMessagePackage(ID_HANDLERS, "please, get me command!"));
     }
 
 

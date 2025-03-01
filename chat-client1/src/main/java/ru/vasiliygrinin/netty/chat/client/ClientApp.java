@@ -21,9 +21,9 @@ public class ClientApp {
             network = new Network();
             builder = new RequestMessagePackageBuilder();
             while (!network.isConnect()){
-//                System.out.println(network.isConnect());
+                System.out.println(network.isConnect());
                 Thread.sleep(200);
             }
-            network.sendMessage(builder.getRequestMessagePackage(0, "create -t=sander -v=all"));
+            network.sendMessage(builder.getRequestMessagePackage(0, "hello"));
     }
 }
