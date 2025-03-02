@@ -12,6 +12,7 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.charset.Charset;
+import java.util.Arrays;
 
 public class RequestMsgPckEncoder extends MessageToByteEncoder<RequestMessagePackage> {
 
