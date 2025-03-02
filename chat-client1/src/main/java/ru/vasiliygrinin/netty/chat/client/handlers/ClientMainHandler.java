@@ -24,19 +24,32 @@ public class ClientMainHandler extends SimpleChannelInboundHandler<ResponseMessa
     }
 
     @Override
-    protected void channelRead0(ChannelHandlerContext ctx, ResponseMessagePackage response) throws Exception {
+    protected void channelRead0(ChannelHandlerContext ctx, ResponseMessagePackage response) {
+        if (response.getIdHandlers() == 400) {
+            ctx.channel().close();
+        }
 
         System.out.println(response.getMessage());
-        String text = scanner.nextLine();
-        RequestMessagePackage message = builder.getRequestMessagePackage(response.getIdHandlers(), text);
-        ctx.writeAndFlush(message);
+        String text;
+        RequestMessagePackage message = null;
 
+        while (!builder.isComplete()) {
+            text = scanner.nextLine();
+            try {
+                message = builder.getRequestMessagePackage(response.getIdHandlers(), text);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
+        builder.clear();
+        ctx.writeAndFlush(message);
 
     }
 
-//    @Override
-//    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-//        cause.printStackTrace();
-//        ctx.disconnect();
-//    }
+    @Override
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
+
+        scanner.close();
+    }
 }

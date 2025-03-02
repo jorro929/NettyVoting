@@ -1,15 +1,16 @@
 package ru.vasiliygrinin.netty.chat.server.votes;
 
 import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import ru.vasiliygrinin.netty.chat.server.abst.AbstractVote;
+import lombok.ToString;
+
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.*;
 
 @EqualsAndHashCode(of = "name, owner")
-public class Vote implements AbstractVote, Serializable {
+@ToString
+public final class Vote implements Serializable {
     @Serial
     private static final long serialVersionUID = 39485602811L;
 
@@ -19,7 +20,7 @@ public class Vote implements AbstractVote, Serializable {
 
     private final String about;
 
-    private Map<String, Integer> answers;
+    private final Map<String, Integer> answers;
 
     private Set<String> participants;
 
@@ -28,6 +29,7 @@ public class Vote implements AbstractVote, Serializable {
         this.owner = owner;
         this.about = about;
         this.answers = new HashMap<>();
+        participants = new HashSet<>();
         addAnswers(answers);
     }
 
@@ -38,7 +40,7 @@ public class Vote implements AbstractVote, Serializable {
     }
 
 
-    @Override
+
     public boolean vote(String answer, String user) {
         if (participants.contains(user)){
             return false;
@@ -51,14 +53,14 @@ public class Vote implements AbstractVote, Serializable {
         }
     }
 
-    @Override
+
     public List<String> getListParticipant() {
         List<String> list = new ArrayList<>();
         list.addAll(participants);
         return list;
     }
 
-    @Override
+
     public List<String> getAnswers() {
 
         List<String> list = new ArrayList<>();
@@ -69,7 +71,7 @@ public class Vote implements AbstractVote, Serializable {
         return list;
     }
 
-    @Override
+
     public Map<String, Integer> getResult() {
         Map<String, Integer> map = new HashMap<>();
         for (Map.Entry<String, Integer> entry: answers.entrySet()) {
@@ -78,16 +80,16 @@ public class Vote implements AbstractVote, Serializable {
         return map;
     }
 
-    @Override
+
     public String getName() {
         return name;
     }
 
-    public String getAuthors() {
+    public String getAuthor() {
         return owner;
     }
 
-    @Override
+
     public String getAbout() {
         return about;
     }

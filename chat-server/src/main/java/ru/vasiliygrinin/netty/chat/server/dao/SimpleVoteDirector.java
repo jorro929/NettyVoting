@@ -1,14 +1,22 @@
 package ru.vasiliygrinin.netty.chat.server.dao;
 
+import org.w3c.dom.ls.LSInput;
 import ru.vasiliygrinin.netty.chat.server.votes.Vote;
 
+import java.io.Serial;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
+import java.util.stream.Collectors;
 
-public class SimpleVoteDirector implements VotesDirector{
+public class SimpleVoteDirector implements VotesDirector, Serializable {
+
+    @Serial
+    private static final long serialVersionUID = 3234634602811L;
 
     ConcurrentMap<String, List<Vote>> topicToVoteMap;
 
@@ -18,14 +26,16 @@ public class SimpleVoteDirector implements VotesDirector{
 
 
     @Override
-    public String createTopic(String topic) {
+    public boolean createTopic(String topic) {
+        if(topicToVoteMap.containsKey(topic)) return false;
         topicToVoteMap.putIfAbsent(topic, new ArrayList<Vote>());
-        return topic;
+
+        return true;
     }
 
 
     @Override
-    public Vote createVote(int id, String topic, String name, String author, String about, List<String> answers) {
+    public Vote createVote(String topic, String name, String author, String about, List<String> answers) {
         if(!topicToVoteMap.containsKey(topic)) return null;
         for (Vote oldVote: topicToVoteMap.get(topic)){
             if(oldVote.getName().equals(name)) return null;
@@ -56,28 +66,47 @@ public class SimpleVoteDirector implements VotesDirector{
     }
 
     @Override
-    public Vote view(int id, String topic, String vote) {
-        if(!contains(topic, vote))return null;
+    public Vote view(String topic, String vote) {
+        if(!containsVote(topic, vote))return null;
 
-        return topicToVoteMap.get(topic).stream().filter(vote1 -> vote1.getName() == vote).findFirst().get();
+        return topicToVoteMap.get(topic).stream().filter(vote1 -> vote1.getName().equals(vote)).findFirst().get();
     }
 
     @Override
     public Vote view(String topic, Vote vote) {
-        return null;
+
+        if(!containsVote(topic, vote))return null;
+
+        return topicToVoteMap.get(topic).get(topicToVoteMap.get(topic).indexOf(vote));
+
     }
 
     @Override
-    public void delete(String topic, String vote, String user) {
+    public boolean delete(String topic, String vote) {
+        if(!containsVote(topic, vote)) return false;
+
+        List<Vote> votes = topicToVoteMap.get(topic);
+
+        Vote vote1 = votes.stream().filter(entryVote -> entryVote.getName().equals(vote)).findFirst().get();
+        votes.remove(vote1);
+        return true;
 
     }
 
     @Override
-    public void delete(String topic, Vote vote, String user) {
+    public boolean delete(String topic, Vote vote) {
+        if(!containsVote(topic, vote)) return false;
+        topicToVoteMap.get(topic).remove(vote);
+        return true;
 
     }
 
-    private boolean contains(String topic, String name){
+    @Override
+    public boolean containsTopic(String topic) {
+        return topicToVoteMap.containsKey(topic);
+    }
+
+    private boolean containsVote(String topic, String name){
 
         if(!topicToVoteMap.containsKey(topic)) return false;
         for (Vote vote: topicToVoteMap.get(topic)){
@@ -86,7 +115,7 @@ public class SimpleVoteDirector implements VotesDirector{
         return false;
     }
 
-    private boolean contains(String topic, Vote vote){
+    private boolean containsVote(String topic, Vote vote){
 
         if(!topicToVoteMap.containsKey(topic)) return false;
         for (Vote OldVote: topicToVoteMap.get(topic)){

@@ -57,14 +57,15 @@ public class RequestMessagePackageBuilder {
     }
     public RequestMessagePackage getRequestMessagePackage(int idHandler, String text) throws Exception {
 
-        clean();
+        clear();
         msg.setIdHandlers(idHandler);
         textToMsg(text);
         return getRequestMessagePackage();
     }
 
 
-    public void clean(){
+
+    public void clear(){
         msg.setCommandName(null);
         msg.setIdHandlers(0);
         for (Param param: msg.getParams()){
@@ -95,7 +96,7 @@ public class RequestMessagePackageBuilder {
     }
 
 
-    private boolean isComplete() {
+    public boolean isComplete() {
         return !(Objects.isNull(msg.getCommandName()) || msg.getCommandName().isEmpty());
     }
 
