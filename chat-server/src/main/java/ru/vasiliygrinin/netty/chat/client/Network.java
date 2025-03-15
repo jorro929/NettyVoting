@@ -22,10 +22,13 @@ import java.util.Scanner;
 public class Network {
     private SocketChannel channel;
 
-    private static final String HOST = "localhost";
-    private static final int PORT = 8189;
+    private final String host;
+    private final int port;
 
-    public Network() {
+    public Network(String host, int port, Scanner scanner) {
+         this.host = host;
+         this.port = port;
+
         new Thread(() -> {
 
             try (
@@ -38,12 +41,12 @@ public class Network {
                             @Override
                             protected void initChannel(SocketChannel socketChannel) throws Exception {
                                 channel = socketChannel;
-                                socketChannel.pipeline().addLast(new RequestMsgPckEncoder(), new ResponseMsgPckDecoder(),new ClientMainHandler());
+                                socketChannel.pipeline().addLast(new RequestMsgPckEncoder(), new ResponseMsgPckDecoder(),new ClientMainHandler(scanner));
 
                             }
                         });
 
-                ChannelFuture future = b.connect(HOST, PORT).sync();
+                ChannelFuture future = b.connect(host, port).sync();
                 future.channel().closeFuture().sync();
 
             } catch (Exception e) {

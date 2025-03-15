@@ -16,10 +16,13 @@ public class ClientMainHandler extends SimpleChannelInboundHandler<ResponseMessa
 
     private Scanner scanner;
 
+    public ClientMainHandler(Scanner scanner){
+        this.scanner = scanner;
+    }
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
         builder = new RequestMessagePackageBuilder();
-        scanner = new Scanner(System.in);
+        ctx.writeAndFlush(sendMessage(0));
 
     }
 
@@ -30,26 +33,37 @@ public class ClientMainHandler extends SimpleChannelInboundHandler<ResponseMessa
         }
 
         System.out.println(response.getMessage());
-        String text;
+
+        ctx.writeAndFlush(sendMessage(response.getIdHandlers()));
+
+    }
+
+    private RequestMessagePackage sendMessage(int idHandlers){
+        String text = "";
         RequestMessagePackage message = null;
 
         while (!builder.isComplete()) {
+
+            System.out.println(scanner.hasNextLine());
+
             text = scanner.nextLine();
+
             try {
-                message = builder.getRequestMessagePackage(response.getIdHandlers(), text);
+                message = builder.getRequestMessagePackage(idHandlers, text);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
         }
-
         builder.clear();
-        ctx.writeAndFlush(message);
 
+        return message;
     }
+
 
     @Override
     public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-
+        cause.printStackTrace();
+        System.out.println("session is over");
         scanner.close();
     }
 }

@@ -102,7 +102,6 @@ public class CreateVoteCommand extends DifficultCommand {
             if (!Character.isDigit(c)) return new ResponseMessagePackage(1, "please, get number");
         }
         voteBuilder.setCountAnswer(Integer.parseInt(message));
-        System.out.println(voteBuilder.getCountAnswer());
         nextStep();
         return new ResponseMessagePackage(1, "please, get answer");
 
@@ -114,8 +113,6 @@ public class CreateVoteCommand extends DifficultCommand {
             return new ResponseMessagePackage(1, "please, get other answer");
         }
         voteBuilder.addAnswer(message);
-        System.out.println(voteBuilder.getCountAnswer());
-        System.out.println(voteBuilder.getAnswers().size());
         if (voteBuilder.getAnswers().size() == voteBuilder.getCountAnswer()) {
             votesDirector.createVote(
                     voteBuilder.getTopic(),
