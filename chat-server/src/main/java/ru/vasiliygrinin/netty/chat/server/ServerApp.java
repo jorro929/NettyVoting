@@ -68,9 +68,8 @@ public class ServerApp {
 
         try {
             while (isActive) {
-                System.out.println("Hello, Admin!");
                 command = scanner.nextLine();
-                System.out.println("Hello, Admin!");
+
                 switch (command) {
                     case "exit":
                         future.channel().close();
@@ -106,6 +105,21 @@ public class ServerApp {
         } catch (IOException e) {
             System.err.println("please, get correct file");
             save();
+        }
+    }
+
+    private void load(){
+        try {
+            String fileWay = scanner.nextLine();
+            if(!fileWay.endsWith(".bin")){
+                fileWay += ".bin";
+            }
+            if(fileWay.equals("-")) return;
+            daoManager.save(new File(fileWay));
+            System.out.println("Successful!");
+        } catch (IOException e) {
+            System.err.println("please, get correct file");
+            load();
         }
     }
 }

@@ -37,7 +37,7 @@ public class MainHandler extends SimpleChannelInboundHandler<RequestMessagePacka
     @Override
     protected void channelRead0(ChannelHandlerContext ctx, RequestMessagePackage message) throws Exception {
 
-        System.out.println(message);
+//        System.out.println(message);
 
         ResponseMessagePackage response = commandManager.doCommand(ctx, message);
 
